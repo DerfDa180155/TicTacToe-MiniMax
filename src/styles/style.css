@@ -1,0 +1,17 @@
+body {
+    background-color: rgb(190, 143, 71);
+}
+
+table {
+    border: solid 5px;
+    background-color: black;
+    text-align: center;
+}
+
+td {
+    border: solid 2px;
+    background-color: gray;
+    width: 100px;
+    height: 100px;
+    font-size: 50px;
+}
