@@ -4,8 +4,14 @@ window.onload = (event) => {
 
 var turn = 0;
 var status = "running";
+var OverallScore = [0, 0];
 
 function place(item) {
+    if(status == "stopped") {
+        clear();
+        return;
+    }
+
     if(document.getElementById(item).innerText == "" && status == "running") {
         if(turn%2==0) {
             document.getElementById(item).innerText = "X";
@@ -14,9 +20,7 @@ function place(item) {
             document.getElementById(item).innerText = "O";
         }
 
-        var board = [[document.getElementById("1").innerText, document.getElementById("2").innerText, document.getElementById("3").innerText],
-            [document.getElementById("4").innerText, document.getElementById("5").innerText, document.getElementById("6").innerText],
-            [document.getElementById("7").innerText, document.getElementById("8").innerText, document.getElementById("9").innerText]];
+        var board = getBoard();
 
         var score = calculateWin(board);
         if(score == 10) {
@@ -28,21 +32,23 @@ function place(item) {
             status = "stopped";
         }
         
-        if(status == "running") {
+        if(status == "running" && turn < 8) {
             console.log("Start Minimax " + turn);
             minimax("O", board, 9-turn);
         }
 
-        board = [[document.getElementById("1").innerText, document.getElementById("2").innerText, document.getElementById("3").innerText],
-            [document.getElementById("4").innerText, document.getElementById("5").innerText, document.getElementById("6").innerText],
-            [document.getElementById("7").innerText, document.getElementById("8").innerText, document.getElementById("9").innerText]];
+        board = getBoard();
 
         score = calculateWin(board);
         if(score == 10) {
+            OverallScore[0] += 1;
+            updateCurrentScore();
             alert("The winner is X");
             status = "stopped";
         }
         else if (score == -10) {
+            OverallScore[1] += 1;
+            updateCurrentScore();
             alert("The winner is O");
             status = "stopped";
         }
@@ -50,6 +56,10 @@ function place(item) {
         turn++;
         
         if(turn >= 9 && status == "running") {
+            OverallScore[0] += 0.5;
+            OverallScore[1] += 0.5;
+            status = "stopped"
+            updateCurrentScore();
             alert("Tie");
         }
         
@@ -57,8 +67,17 @@ function place(item) {
 }
 
 function reset() {
-    turn = 0;
-    status = "running";
+    clear();
+
+    OverallScore = [0, 0]; // reset the Score
+    updateCurrentScore();
+}
+
+function clear() {
+    turn = 0; // reset the turn of the game
+    status = "running"; // restart the game
+
+    // clear the board
     document.getElementById("1").innerText = "";
     document.getElementById("2").innerText = "";
     document.getElementById("3").innerText = "";
@@ -70,12 +89,16 @@ function reset() {
     document.getElementById("9").innerText = "";
 }
 
-function getBoard() { // need to be tested and implemented
+function getBoard() { // returns the current board as a 2 Dim-Array
     var board = [[document.getElementById("1").innerText, document.getElementById("2").innerText, document.getElementById("3").innerText],
             [document.getElementById("4").innerText, document.getElementById("5").innerText, document.getElementById("6").innerText],
             [document.getElementById("7").innerText, document.getElementById("8").innerText, document.getElementById("9").innerText]];
 
     return board;
+}
+
+function updateCurrentScore() { // displays the updated score
+    document.getElementById("score").innerText = OverallScore[0] + " - " + OverallScore[1];
 }
 
 function calculateWin(board) {
