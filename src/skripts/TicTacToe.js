@@ -25,10 +25,14 @@ function place(item) {
 
         var score = calculateWin(board);
         if(score == 10) {
+            OverallScore[0] += 1;
+            updateCurrentScore();
             alert("The winner is X");
             status = "stopped";
         }
         else if (score == -10) {
+            OverallScore[1] += 1;
+            updateCurrentScore();
             alert("The winner is O");
             status = "stopped";
         }
