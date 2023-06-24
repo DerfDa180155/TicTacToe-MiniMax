@@ -5,6 +5,7 @@ window.onload = (event) => {
 var turn = 0;
 var status = "running";
 var OverallScore = [0, 0];
+var gameMode = 0;
 
 function place(item) {
     if(status == "stopped") {
@@ -32,26 +33,29 @@ function place(item) {
             status = "stopped";
         }
         
-        if(status == "running" && turn < 8) {
-            console.log("Start Minimax " + turn);
-            minimax("O", board, 9-turn);
+        if(gameMode == 0) { // minimax (bot player) only in singleplayer mode
+            if(status == "running" && turn < 8) {
+                console.log("Start Minimax " + turn);
+                minimax("O", board, 9-turn);
+            }
+    
+            board = getBoard();
+    
+            score = calculateWin(board);
+            if(score == 10) {
+                OverallScore[0] += 1;
+                updateCurrentScore();
+                alert("The winner is X");
+                status = "stopped";
+            }
+            else if (score == -10) {
+                OverallScore[1] += 1;
+                updateCurrentScore();
+                alert("The winner is O");
+                status = "stopped";
+            }
         }
-
-        board = getBoard();
-
-        score = calculateWin(board);
-        if(score == 10) {
-            OverallScore[0] += 1;
-            updateCurrentScore();
-            alert("The winner is X");
-            status = "stopped";
-        }
-        else if (score == -10) {
-            OverallScore[1] += 1;
-            updateCurrentScore();
-            alert("The winner is O");
-            status = "stopped";
-        }
+        
         
         turn++;
         
@@ -66,14 +70,20 @@ function place(item) {
     }
 }
 
-function reset() {
-    clear();
-
-    OverallScore = [0, 0]; // reset the Score
-    updateCurrentScore();
+function mode(mode) { // switches the mode between singelplayer and multiplayer
+    //alert("Test " + mode);
+    gameMode = mode; // set the game mode variable
+    reset(); // reset the game when the mode is switched
 }
 
-function clear() {
+function reset() { // resets the entire game
+    clear(); // clears the board
+
+    OverallScore = [0, 0]; // reset the Score
+    updateCurrentScore(); // displays the new score
+}
+
+function clear() { // clears the board and restart a new game
     turn = 0; // reset the turn of the game
     status = "running"; // restart the game
 
@@ -89,6 +99,10 @@ function clear() {
     document.getElementById("9").innerText = "";
 }
 
+function updateCurrentScore() { // displays the updated score
+    document.getElementById("score").innerText = OverallScore[0] + " - " + OverallScore[1];
+}
+
 function getBoard() { // returns the current board as a 2 Dim-Array
     var board = [[document.getElementById("1").innerText, document.getElementById("2").innerText, document.getElementById("3").innerText],
             [document.getElementById("4").innerText, document.getElementById("5").innerText, document.getElementById("6").innerText],
@@ -97,11 +111,7 @@ function getBoard() { // returns the current board as a 2 Dim-Array
     return board;
 }
 
-function updateCurrentScore() { // displays the updated score
-    document.getElementById("score").innerText = OverallScore[0] + " - " + OverallScore[1];
-}
-
-function calculateWin(board) {
+function calculateWin(board) { // checks if a player won the game ( return: -10, 0, 10 )
 
     let winner = "";
     let score = 0;
@@ -159,7 +169,7 @@ function getMovesArray(board) { // doesn´t work, need to be tested and implemen
     for(let i = 0; i < 3; i++) {
         for(let j = 0; j < 3; j++) {
             if(board[i][j] == "") {
-                moves[count] = i*3+j;
+                moves[count] = i*3+j; // a formula to store 2 integer values ​​in one
                 count++;
             }
         }
@@ -168,17 +178,22 @@ function getMovesArray(board) { // doesn´t work, need to be tested and implemen
 }
 
 function makeMove(board, move, player) { // returns a new board array with the played move
+    // get both integer values ​​back (i, j)
     let temp = move%3;
     let i = (move-temp)/3;
     let j = move-i*3;
+
+    // new board variable
     let newBoard = [["", "", ""], ["", "", ""], ["", "", ""]];
 
+    // fills the new board with the current board
     for(let x = 0; x < 3; x++) {
         for(let y = 0; y < 3; y++) {
             newBoard[x][y] = board[x][y];
         }
     }
 
+    // add the new board move
     newBoard[i][j] = player;
     return newBoard;
 }
@@ -244,7 +259,7 @@ function minimax(player, board, depth) {
         score = bestscore;
     }
     
-    if(depth == 9-turn) {
+    if(depth == 9-turn) { // play the best move to the actual board
         //alert("move is " + move);
         document.getElementById(move+1).innerText = player;
         turn++;
