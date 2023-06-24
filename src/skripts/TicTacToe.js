@@ -14,6 +14,8 @@ function place(item) {
     }
 
     if(document.getElementById(item).innerText == "" && status == "running") {
+        CSSClass(item);
+        
         if(turn%2==0) {
             document.getElementById(item).innerText = "X";
         }
@@ -74,6 +76,38 @@ function place(item) {
     }
 }
 
+function CSSClass(item) {
+    document.getElementById(item).classList.remove("empty");
+
+    clearCSS(false);
+
+    document.getElementById(item).classList.add("last");
+}
+
+function clearCSS(reset) {
+    document.getElementById(1).classList.remove("last");
+    document.getElementById(2).classList.remove("last");
+    document.getElementById(3).classList.remove("last");
+    document.getElementById(4).classList.remove("last");
+    document.getElementById(5).classList.remove("last");
+    document.getElementById(6).classList.remove("last");
+    document.getElementById(7).classList.remove("last");
+    document.getElementById(8).classList.remove("last");
+    document.getElementById(9).classList.remove("last");
+
+    if(reset) {
+        document.getElementById(1).classList.add("empty");
+        document.getElementById(2).classList.add("empty");
+        document.getElementById(3).classList.add("empty");
+        document.getElementById(4).classList.add("empty");
+        document.getElementById(5).classList.add("empty");
+        document.getElementById(6).classList.add("empty");
+        document.getElementById(7).classList.add("empty");
+        document.getElementById(8).classList.add("empty");
+        document.getElementById(9).classList.add("empty");
+    }
+}
+
 function mode(mode) { // switches the mode between singelplayer and multiplayer
     //alert("Test " + mode);
     gameMode = mode; // set the game mode variable
@@ -101,6 +135,8 @@ function clear() { // clears the board and restart a new game
     document.getElementById("7").innerText = "";
     document.getElementById("8").innerText = "";
     document.getElementById("9").innerText = "";
+
+    clearCSS(true);
 }
 
 function updateCurrentScore() { // displays the updated score
@@ -265,6 +301,7 @@ function minimax(player, board, depth) {
     
     if(depth == 9-turn) { // play the best move to the actual board
         //alert("move is " + move);
+        CSSClass(move+1);
         document.getElementById(move+1).innerText = player;
         turn++;
     }
